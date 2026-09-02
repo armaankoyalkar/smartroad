@@ -26,14 +26,27 @@ How the rows are made (all draws come from numpy's default_rng seeded with --see
       has more fog), road surface depends on weather, speed limit depends on road
       type, light conditions depend on hour and area type, category weights change
       when the surface is flooded (waterlogging becomes likely).
-    * Severity (the target) follows the documented stochastic rule below: a
-      score adds fixed contributions for higher speed limits, darkness, wet or
-      flooded surfaces, rain or fog, highways and junctions, accident-like
-      categories, late-night hours, weekends, rural areas and cluster membership,
-      then Gaussian noise (sigma 0.6) is added and the score is cut at two fixed
-      thresholds. The noise keeps every model well below 100 % accuracy; HIGH is a
-      minority class (documented bound: 12 % to 20 % of rows) so class weighting
-      matters.
+    * Severity (the target) follows the documented stochastic rule below. A
+      score adds fixed ADDITIVE contributions for higher speed limits, darkness,
+      wet or flooded surfaces, rain or fog, highways and junctions, accident-like
+      categories, late-night hours, weekends, rural areas and cluster membership.
+      On top of that, INTERACTION terms add extra score only when conditions
+      combine, because crash severity in the real world depends on combinations
+      rather than on each factor alone:
+        - darkness (DARK_LIT or DARK_UNLIT) on a WET surface (+0.35) or a FLOODED
+          surface (+0.55);
+        - a high speed limit (80 km/h or more) in darkness (+0.45) or in RAIN (+0.35);
+        - a JUNCTION during late-night hours 23:00-04:59 (+0.45);
+        - a HIGHWAY in FOG (+0.6);
+        - an ACCIDENT or UNSAFE_ROAD report at 80 km/h or more (+0.5);
+        - a weekend night, i.e. Saturday or Sunday in darkness (+0.3).
+      Gaussian noise (sigma 0.6) is then added and the score is cut at two fixed
+      thresholds (LOW below 1.75, MEDIUM up to 2.95, HIGH above). The noise keeps
+      every model well below 100 % accuracy; HIGH is a minority class (documented
+      bound: 12 % to 20 % of rows) so class weighting matters. Because the rule is
+      no longer purely additive, a model that can represent interactions has
+      something to gain over a linear one; that is a property of this synthetic
+      rule, not evidence about real roads.
 """
 
 from __future__ import annotations
@@ -113,9 +126,20 @@ LATE_NIGHT_SCORE = 0.5
 WEEKEND_SCORE = 0.15
 RURAL_SCORE = 0.2
 CLUSTER_SCORE = 0.35
+# Interaction terms (added only when the listed conditions coincide).
+HIGH_SPEED_KMH = 80  # "high speed" means speed_limit >= 80
+DARK_WET_SCORE = 0.35  # darkness (DARK_LIT or DARK_UNLIT) and a WET surface
+DARK_FLOODED_SCORE = 0.55  # darkness and a FLOODED surface
+HIGH_SPEED_DARK_SCORE = 0.45  # speed_limit >= 80 in darkness
+HIGH_SPEED_RAIN_SCORE = 0.35  # speed_limit >= 80 in RAIN
+JUNCTION_LATE_NIGHT_SCORE = 0.45  # JUNCTION during 23:00-04:59
+HIGHWAY_FOG_SCORE = 0.6  # HIGHWAY in FOG
+DANGEROUS_CATEGORIES = {"ACCIDENT", "UNSAFE_ROAD"}
+DANGEROUS_HIGH_SPEED_SCORE = 0.5  # ACCIDENT or UNSAFE_ROAD at speed_limit >= 80
+WEEKEND_NIGHT_SCORE = 0.3  # Saturday or Sunday in darkness
 NOISE_SIGMA = 0.6
-THRESHOLD_MEDIUM = 1.55
-THRESHOLD_HIGH = 2.55
+THRESHOLD_MEDIUM = 1.75
+THRESHOLD_HIGH = 2.95
 
 HOUR_WEIGHTS = np.array(
     [0.35, 0.35, 0.35, 0.35, 0.35, 0.5, 0.8, 1.4, 1.4, 1.4, 1.4, 1.1]
@@ -127,8 +151,11 @@ SEVERITY_RULE = (
     "+ surface (WET 0.4, FLOODED 0.7) + weather (RAIN 0.2, FOG 0.4, OTHER 0.1) "
     "+ road type (HIGHWAY 0.6, JUNCTION 0.5, ARTERIAL 0.2) + category (ACCIDENT 0.9, UNSAFE_ROAD 0.6, "
     "OBSTRUCTION 0.3, WATERLOGGING 0.3, TRAFFIC_SIGNAL 0.2) + 0.5 late night (23:00-04:59) "
-    "+ 0.15 weekend + 0.2 rural + 0.35 inside a spatial cluster + Normal(0, 0.6); "
-    "LOW below 1.55, MEDIUM up to 2.55, HIGH above."
+    "+ 0.15 weekend + 0.2 rural + 0.35 inside a spatial cluster "
+    "+ interactions: 0.35 dark and WET, 0.55 dark and FLOODED, 0.45 speed_limit>=80 and dark, "
+    "0.35 speed_limit>=80 and RAIN, 0.45 JUNCTION and late night, 0.6 HIGHWAY and FOG, "
+    "0.5 ACCIDENT/UNSAFE_ROAD and speed_limit>=80, 0.3 weekend and dark "
+    "+ Normal(0, 0.6); LOW below 1.75, MEDIUM up to 2.95, HIGH above."
 )
 
 DATASET_CARD = {
@@ -148,8 +175,8 @@ DATASET_CARD = {
         "Entirely synthetic: no real road, incident or measurement is represented.",
         "The target is produced by a hand-written rule plus noise, so any metric only demonstrates "
         "that the pipeline works; it says nothing about real roads.",
-        "The spatial clusters and the feature-to-severity relations were chosen by the team, "
-        "not observed.",
+        "The spatial clusters and the feature-to-severity relations, including the interaction "
+        "terms, were chosen by the team, not observed.",
         "Feature values are drawn independently of any real Hyderabad road network or weather record.",
     ],
 }
@@ -204,6 +231,34 @@ def _season(month: np.ndarray) -> np.ndarray:
     season[np.isin(month, [6, 7, 8, 9])] = "monsoon"
     season[np.isin(month, [11, 12, 1])] = "winter"
     return season
+
+
+def _interaction_score(
+    *,
+    hour: np.ndarray,
+    weekday: np.ndarray,
+    is_dark: np.ndarray,
+    weather: np.ndarray,
+    surface: np.ndarray,
+    road_type: np.ndarray,
+    speed: np.ndarray,
+    category: np.ndarray,
+) -> np.ndarray:
+    """Score added only when conditions coincide (the interaction terms of the module docstring)."""
+    high_speed = speed >= HIGH_SPEED_KMH
+    late_night = np.isin(hour, list(LATE_NIGHT_HOURS))
+    weekend = weekday >= 5
+    dangerous = np.isin(category, list(DANGEROUS_CATEGORIES))
+    score = np.zeros(len(hour), dtype=float)
+    score += np.where(is_dark & (surface == "WET"), DARK_WET_SCORE, 0.0)
+    score += np.where(is_dark & (surface == "FLOODED"), DARK_FLOODED_SCORE, 0.0)
+    score += np.where(high_speed & is_dark, HIGH_SPEED_DARK_SCORE, 0.0)
+    score += np.where(high_speed & (weather == "RAIN"), HIGH_SPEED_RAIN_SCORE, 0.0)
+    score += np.where((road_type == "JUNCTION") & late_night, JUNCTION_LATE_NIGHT_SCORE, 0.0)
+    score += np.where((road_type == "HIGHWAY") & (weather == "FOG"), HIGHWAY_FOG_SCORE, 0.0)
+    score += np.where(dangerous & high_speed, DANGEROUS_HIGH_SPEED_SCORE, 0.0)
+    score += np.where(weekend & is_dark, WEEKEND_NIGHT_SCORE, 0.0)
+    return score
 
 
 def generate(rows: int = DEFAULT_ROWS, seed: int = SEED) -> pd.DataFrame:
@@ -289,6 +344,16 @@ def generate(rows: int = DEFAULT_ROWS, seed: int = SEED) -> pd.DataFrame:
     score = score + np.where(weekday >= 5, WEEKEND_SCORE, 0.0)
     score = score + np.where(area == "RURAL", RURAL_SCORE, 0.0)
     score = score + np.where(in_cluster, CLUSTER_SCORE, 0.0)
+    score = score + _interaction_score(
+        hour=hour,
+        weekday=weekday,
+        is_dark=is_dark,
+        weather=weather,
+        surface=surface,
+        road_type=road_type,
+        speed=speed,
+        category=category,
+    )
     score = score + rng.normal(0.0, NOISE_SIGMA, rows)
     severity = np.where(score < THRESHOLD_MEDIUM, "LOW", np.where(score < THRESHOLD_HIGH, "MEDIUM", "HIGH"))
 

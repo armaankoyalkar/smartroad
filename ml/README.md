@@ -84,12 +84,18 @@ training fold (macro F1 mean and standard deviation). **Selection rule:** the ca
 highest test macro F1 among LogisticRegression, DecisionTree and RandomForest is written to
 `model.joblib`; `metrics.json` records the rule (`selection_rule`), the winner
 (`selected_candidate`, `model_name`) and the full comparison. Selecting on the test set is a mild
-optimistic bias, which is why the cross-validated score is shown next to it. If the RandomForest is
-not the winner the run says so and ships the winner anyway; on the demo dataset the
-LogisticRegression usually wins because the synthetic severity rule is additive in the features.
+optimistic bias, which is why the cross-validated score is shown next to it. The shipped model is
+whichever candidate wins on test macro F1; nothing in the pipeline prefers the RandomForest. If the
+forest is not the winner the run says so and ships the winner anyway. On the demo dataset the margin
+between LogisticRegression and RandomForest is small: the synthetic severity rule is additive plus a
+few documented interaction terms (`data/README.md`), so either can win depending on the sample, and
+the two may disagree with the cross-validated ranking. Read the numbers from `metrics.json` of the
+run you have; this README does not quote them.
 
-The version label is `demo-{model}-1.0.0` with `{model}` = `lr`, `dt` or `rf` for the shipped
-candidate (so `demo-rf-1.0.0` when the forest wins), and it never misnames the model.
+The version label is `demo-{model}-1.0.0` with `{model}` set from the shipped candidate:
+`demo-lr-1.0.0` for LogisticRegression, `demo-dt-1.0.0` for DecisionTree, `demo-rf-1.0.0` for
+RandomForest. `model_version` and `model_name` in `metrics.json` (and therefore `/health` and
+`/model/info`) always describe the model actually written to `model.joblib`.
 
 Also produced: impurity importances (tree models, aggregated back to the ten original features),
 permutation importance on the test set (macro F1 drop, 5 repeats, seed 42), per-feature baselines

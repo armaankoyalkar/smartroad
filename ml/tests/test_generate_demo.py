@@ -70,6 +70,32 @@ def test_severity_depends_on_the_documented_rule(demo_frame):
     assert (accidents["severity"] == "HIGH").mean() > (potholes["severity"] == "HIGH").mean()
 
 
+def test_severity_interaction_terms_add_to_the_score(demo_generator):
+    """The documented interactions raise the HIGH share beyond what the additive parts give alone."""
+    frame = demo_generator.generate(rows=demo_generator.DEFAULT_ROWS, seed=demo_generator.SEED)
+    hour = pd.to_datetime(frame["timestamp"]).dt.hour
+    dark = frame["light_conditions"] != "DAYLIGHT"
+    fast = frame["speed_limit"] >= demo_generator.HIGH_SPEED_KMH
+    wet = frame["road_surface"].isin(["WET", "FLOODED"])
+    late_night = hour.isin(demo_generator.LATE_NIGHT_HOURS)
+    high = frame["severity"] == "HIGH"
+
+    def share(mask: pd.Series) -> float:
+        assert mask.sum() >= 30, "combination too rare to compare"
+        return float(high[mask].mean())
+
+    # Darkness on a wet/flooded surface is worse than either condition alone.
+    assert share(dark & wet) > max(share(dark & ~wet), share(~dark & wet))
+    # High speed in darkness is worse than high speed in daylight or darkness at low speed.
+    assert share(fast & dark) > max(share(fast & ~dark), share(~fast & dark))
+    # A junction late at night is worse than a junction by day or late night elsewhere.
+    junction = frame["road_type"] == "JUNCTION"
+    assert share(junction & late_night) > max(share(junction & ~late_night), share(~junction & late_night))
+    # Accident/unsafe-road reports at high speed are worse than the same categories at low speed.
+    dangerous = frame["category"].isin(demo_generator.DANGEROUS_CATEGORIES)
+    assert share(dangerous & fast) > share(dangerous & ~fast)
+
+
 def test_dataset_card_is_labelled_as_demo(demo_generator):
     card = demo_generator.DATASET_CARD
     assert card["is_demo_data"] is True
