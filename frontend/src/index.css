@@ -1,0 +1,389 @@
+@import "tailwindcss";
+
+/*
+ * SmartRoad design tokens (Tailwind CSS 4 theme variables).
+ * Dark navy identity shared by the public, citizen and admin areas.
+ * Category colours are never defined here: they come from GET /api/meta/categories.
+ */
+@theme {
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
+
+  --color-navy-950: #070d19;
+  --color-navy-900: #0b1220;
+  --color-navy-800: #111a2e;
+  --color-navy-700: #182540;
+  --color-navy-600: #22314f;
+  --color-navy-500: #34466b;
+
+  --color-cyan-300: #67e8f9;
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+  --color-blue-500: #3b82f6;
+
+  --color-text: #e6edf7;
+  --color-muted: #94a3b8;
+  --color-faint: #64748b;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  --radius-card: 12px;
+  --shadow-card: 0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 12px 32px -16px rgb(0 0 0 / 0.7);
+  --shadow-glow: 0 0 0 1px rgb(34 211 238 / 0.25), 0 0 28px -6px rgb(34 211 238 / 0.45);
+  --shadow-pop: 0 20px 50px -20px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
+
+  --animate-fade-in: fade-in 0.35s ease-out both;
+  --animate-slide-up: slide-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-slide-down: slide-down 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-scale-in: scale-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-pulse-soft: pulse-soft 2.4s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-slide-in-left: slide-in-left 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-slide-in-right: slide-in-right 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slide-down {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes pulse-soft {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
+  }
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: -200% 0;
+    }
+    to {
+      background-position: 200% 0;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-navy-950 font-sans text-text antialiased;
+    font-feature-settings: "cv11", "ss01";
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    background: rgb(34 211 238 / 0.3);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-cyan-400);
+    outline-offset: 2px;
+  }
+
+  /* Numbers in stats and tables align in columns. */
+  .tabular,
+  table,
+  [data-tabular] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Translucent panel on the dark background. */
+@utility glass {
+  background-color: rgb(255 255 255 / 0.05);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+@utility glass-strong {
+  background-color: rgb(11 18 32 / 0.8);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* Standard card surface: navy-800, 1px navy-600 border, 12px radius. */
+@utility surface {
+  background-color: var(--color-navy-800);
+  border: 1px solid var(--color-navy-600);
+  border-radius: var(--radius-card);
+}
+
+@utility surface-elevated {
+  background-color: var(--color-navy-700);
+  border: 1px solid var(--color-navy-500);
+  border-radius: var(--radius-card);
+}
+
+/* Subtle "city grid" pattern for hero sections (CSS only, no images). */
+@utility city-grid {
+  background-image:
+    linear-gradient(to right, rgb(103 232 249 / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(103 232 249 / 0.07) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 85% 75% at 50% 35%, #000 15%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 35%, #000 15%, transparent 78%);
+}
+
+@utility city-grid-fine {
+  background-image:
+    linear-gradient(to right, rgb(103 232 249 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(103 232 249 / 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Soft radial glow behind hero content. */
+@utility glow-spot {
+  background: radial-gradient(60% 50% at 50% 0%, rgb(34 211 238 / 0.18) 0%, transparent 70%);
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-navy-600) transparent;
+}
+
+@utility skeleton {
+  background: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0.05) 0%,
+    rgb(255 255 255 / 0.1) 50%,
+    rgb(255 255 255 / 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+  border-radius: 6px;
+}
+
+/*
+ * Leaflet on the dark theme. Deliberately NOT inside a cascade layer: leaflet.css is
+ * unlayered, and unlayered rules beat layered ones, so these overrides must be unlayered too.
+ */
+.leaflet-container {
+  background: var(--color-navy-900);
+  font-family: inherit;
+  border-radius: inherit;
+}
+
+.leaflet-container.map-dark-tiles .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(195deg) brightness(0.86) contrast(0.92) saturate(0.55);
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--color-navy-800);
+  color: var(--color-text);
+  border: 1px solid var(--color-navy-600);
+  box-shadow: var(--shadow-pop);
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 10px;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px;
+  line-height: 1.45;
+  font-size: 13px;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--color-muted);
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: var(--color-text);
+}
+
+.leaflet-bar {
+  border: 1px solid var(--color-navy-600) !important;
+  box-shadow: var(--shadow-card);
+}
+
+.leaflet-bar a {
+  background: var(--color-navy-800);
+  color: var(--color-text);
+  border-bottom-color: var(--color-navy-600);
+}
+
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+  background: var(--color-navy-700);
+  color: var(--color-cyan-300);
+}
+
+.leaflet-bar a.leaflet-disabled {
+  background: var(--color-navy-900);
+  color: var(--color-faint);
+}
+
+.leaflet-control-attribution {
+  background: rgb(7 13 25 / 0.75) !important;
+  color: var(--color-muted) !important;
+  font-size: 11px;
+}
+
+.leaflet-control-attribution a {
+  color: var(--color-cyan-300) !important;
+}
+
+.leaflet-tooltip {
+  background: var(--color-navy-800);
+  color: var(--color-text);
+  border: 1px solid var(--color-navy-600);
+  border-radius: 6px;
+  box-shadow: var(--shadow-card);
+  font-size: 12px;
+}
+
+.leaflet-tooltip-top::before {
+  border-top-color: var(--color-navy-600);
+}
+
+.leaflet-tooltip-bottom::before {
+  border-bottom-color: var(--color-navy-600);
+}
+
+.leaflet-tooltip.hotspot-count {
+  background: rgb(11 18 32 / 0.85);
+  border-color: rgb(34 211 238 / 0.5);
+  color: var(--color-cyan-300);
+  font-weight: 600;
+  padding: 2px 8px;
+}
+
+.leaflet-tooltip.hotspot-count::before {
+  display: none;
+}
+
+/* Marker clusters (react-leaflet-cluster). */
+.marker-cluster {
+  background-clip: padding-box;
+  border-radius: 999px;
+  background: rgb(34 211 238 / 0.2);
+}
+
+.marker-cluster div {
+  width: 32px;
+  height: 32px;
+  margin: 4px;
+  border-radius: 999px;
+  background: rgb(34 211 238 / 0.85);
+  color: var(--color-navy-950);
+  font-weight: 600;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+
+.marker-cluster-medium {
+  background: rgb(59 130 246 / 0.25);
+}
+
+.marker-cluster-medium div {
+  background: rgb(96 165 250 / 0.9);
+}
+
+.marker-cluster-large {
+  background: rgb(245 158 11 / 0.25);
+}
+
+.marker-cluster-large div {
+  background: rgb(251 191 36 / 0.9);
+}
+
+/* Location picker marker (a div icon, so no image path issues). Anchored at its centre. */
+.sr-pin {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--color-cyan-400);
+  border: 3px solid var(--color-navy-950);
+  box-shadow:
+    0 0 0 4px rgb(34 211 238 / 0.3),
+    0 6px 16px rgb(0 0 0 / 0.55);
+  cursor: grab;
+}
+
+.leaflet-marker-draggable .sr-pin:active {
+  cursor: grabbing;
+}
+
+.sr-pin:focus-visible {
+  outline: 2px solid var(--color-cyan-300);
+  outline-offset: 3px;
+}
