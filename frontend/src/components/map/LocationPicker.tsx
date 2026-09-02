@@ -92,6 +92,8 @@ export function LocationPicker({
       if (position) onChange(null, "input");
       return;
     }
+    // One box still empty: wait for the other value (Number("") would silently become 0).
+    if (latText.trim() === "" || lngText.trim() === "") return;
     const lat = Number(latText);
     const lng = Number(lngText);
     if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return;
