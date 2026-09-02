@@ -148,11 +148,11 @@ export default function AdminIncidentDetailsPage() {
             />
           </Card>
           <AdminIncidentFacts incident={incident} />
-          <RiskEstimatePanel incident={incident} />
+          <RiskEstimatePanel key={incident.id} incident={incident} />
           <AdminStatusTimeline history={incident.statusHistory} />
         </div>
         <div className="space-y-4">
-          <StatusChangeForm incident={incident} />
+          <StatusChangeForm key={`${incident.id}-${incident.status}`} incident={incident} />
           <PriorityForm key={`${incident.id}-${incident.priority ?? "none"}`} incident={incident} />
           <DangerZone incident={incident} />
         </div>

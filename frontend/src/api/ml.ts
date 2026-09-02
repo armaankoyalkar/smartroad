@@ -34,7 +34,8 @@ export function getIncidentRisk(id: string, params: IncidentRiskParams = {}): Pr
 
 /** POST /api/ml/risk/refresh (admin): batch-estimate and store risk for stored incidents. */
 export function refreshRisk(): Promise<RiskRefreshResult> {
-  return requestData<RiskRefreshResult>({ method: "POST", url: "/ml/risk/refresh" });
+  // Up to 5000 incidents are estimated and written back; allow more than the default 20 s.
+  return requestData<RiskRefreshResult>({ method: "POST", url: "/ml/risk/refresh", timeout: 120_000 });
 }
 
 /** GET /api/ml/risk/distribution (admin): counts of stored estimates by level (no ML call). */

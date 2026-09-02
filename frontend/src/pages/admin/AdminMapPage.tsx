@@ -115,7 +115,7 @@ export default function AdminMapPage() {
           </TabPanel>
         </Card>
 
-        <div className="flex min-h-[60vh] flex-col gap-2 lg:h-[calc(100dvh-11rem)]">
+        <div className="flex h-[60vh] flex-col gap-2 lg:h-[calc(100dvh-11rem)]">
           <MapStatusBar
             count={incidents.data?.meta.count}
             truncated={incidents.data?.meta.truncated}

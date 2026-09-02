@@ -7,7 +7,17 @@ import { formatNumber, formatRelative } from "@/utils/format";
  */
 export function StatsStrip() {
   const stats = usePublicStats();
-  if (stats.isPending || stats.isError || !stats.data) return null;
+  if (stats.isPending) return null;
+  if (stats.isError || !stats.data) {
+    return (
+      <p className="text-center text-sm text-muted" role="status">
+        Public figures are unavailable right now (the server could not be reached).{" "}
+        <button type="button" className="underline hover:text-text" onClick={() => void stats.refetch()}>
+          Retry
+        </button>
+      </p>
+    );
+  }
   const d = stats.data;
   const items = [
     { label: "Reports filed", value: d.reportsFiled },

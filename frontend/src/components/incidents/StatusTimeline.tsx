@@ -14,15 +14,16 @@ export interface StatusTimelineProps {
 
 function describeEntry(entry: StatusHistoryEntry, meta: MetaContextValue): { title: string; color: string } {
   if (entry.field === "priority") {
-    if (!entry.to || entry.to === "null") return { title: "Priority cleared", color: NEUTRAL_COLOR };
+    if (!entry.to) return { title: "Priority cleared", color: NEUTRAL_COLOR };
     return {
       title: `Priority set to ${meta.label("priority", entry.to)}`,
       color: (PRIORITY_COLORS as Record<string, string>)[entry.to] ?? NEUTRAL_COLOR,
     };
   }
-  const color = (STATUS_COLORS as Record<string, string>)[entry.to] ?? NEUTRAL_COLOR;
-  if (entry.from === null) return { title: `Report submitted (${meta.label("status", entry.to)})`, color };
-  return { title: `Status changed to ${meta.label("status", entry.to)}`, color };
+  const to = entry.to ?? "";
+  const color = (STATUS_COLORS as Record<string, string>)[to] ?? NEUTRAL_COLOR;
+  if (entry.from === null) return { title: `Report submitted (${meta.label("status", to)})`, color };
+  return { title: `Status changed to ${meta.label("status", to)}`, color };
 }
 
 /**

@@ -13,7 +13,9 @@ export const MY_REPORTS_LIMIT = 10;
  */
 export function useMyReportsParams() {
   const query = useQueryParams();
-  const status = query.getEnumList("status", STATUSES)[0] ?? "";
+  // Multi-valued in the URL (dashboard cards link to comma lists); the select shows a single value.
+  const statusList = query.getEnumList("status", STATUSES);
+  const status: IncidentStatus | "" = statusList.length === 1 ? statusList[0] : "";
   const category = query.getEnumList("category", CATEGORY_KEYS)[0] ?? "";
   const sort =
     sortFromParam(query.get("sort"), INCIDENT_SORT_FIELDS, DEFAULT_INCIDENT_SORT) ?? DEFAULT_INCIDENT_SORT;
@@ -21,16 +23,16 @@ export function useMyReportsParams() {
 
   const params = useMemo<MyIncidentListParams>(
     () => ({
-      status: status ? [status] : undefined,
+      status: statusList.length ? statusList : undefined,
       category: category ? [category] : undefined,
       sort: sortToParam(sort),
       page,
       limit: MY_REPORTS_LIMIT,
     }),
-    [status, category, sort, page],
+    [statusList, category, sort, page],
   );
 
-  const activeFilterCount = (status ? 1 : 0) + (category ? 1 : 0);
+  const activeFilterCount = (statusList.length ? 1 : 0) + (category ? 1 : 0);
 
   return {
     status,

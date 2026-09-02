@@ -35,7 +35,7 @@ export function DashboardStats({ stats, isLoading, error, onRetry }: DashboardSt
         icon={Clock}
         tone="warning"
         isLoading={isLoading}
-        to="/app/reports?status=SUBMITTED"
+        to="/app/reports?status=SUBMITTED,UNDER_REVIEW"
       />
       <StatCard
         label="Verified and in progress"
@@ -44,7 +44,7 @@ export function DashboardStats({ stats, isLoading, error, onRetry }: DashboardSt
         icon={Wrench}
         tone="info"
         isLoading={isLoading}
-        to="/app/reports?status=VERIFIED"
+        to="/app/reports?status=VERIFIED,IN_PROGRESS"
       />
       <StatCard
         label="Resolved"

@@ -28,10 +28,11 @@ These are improvements the team considers worthwhile but did not build. None of 
 16. **Two-factor authentication and password recovery by email.**
 17. **Observability:** structured JSON logs with request ids, metrics, and alerting on health-check failures.
 18. **Continuous integration** running the backend, frontend, ML and end-to-end suites on every pull request, with the banned-phrase check as a gate.
-19. **Load testing** against the documented performance targets with the `seed:load` generator.
+19. **Keyboard-accessible incident list beside the public map** (focusable markers or a synchronised list), and a retry state when the session cannot be restored because the server is unreachable.
+20. **Load testing** against the documented performance targets with the `seed:load` generator.
 
 ## 4. Research directions
 
-20. Compare DBSCAN with HDBSCAN and kernel density estimation for hotspot detection on real data, using the k-distance heuristic to justify `eps` per city.
-21. Study whether citizen-reported severity agrees with administrator priority over time, and whether model risk levels correlate with resolution effort.
-22. Fairness and coverage analysis: reports cluster where smartphone use is high; an authority should combine SmartRoad with inspections so under-reported areas are not neglected.
+21. Compare DBSCAN with HDBSCAN and kernel density estimation for hotspot detection on real data, using the k-distance heuristic to justify `eps` per city.
+22. Study whether citizen-reported severity agrees with administrator priority over time, and whether model risk levels correlate with resolution effort.
+23. Fairness and coverage analysis: reports cluster where smartphone use is high; an authority should combine SmartRoad with inspections so under-reported areas are not neglected.

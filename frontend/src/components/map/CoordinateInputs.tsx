@@ -48,7 +48,7 @@ export function CoordinateInputs({
           onKeyDown={onKeyDown}
         />
       </Field>
-      <Field id={`${idPrefix}-longitude`} label="Longitude" hint="-180 to 180">
+      <Field id={`${idPrefix}-longitude`} label="Longitude" hint="-180 to 180" error={error}>
         <Input
           type="number"
           inputMode="decimal"

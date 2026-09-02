@@ -220,7 +220,7 @@ export interface IncidentImage {
 export interface StatusHistoryEntry {
   field: "status" | "priority";
   from: string | null;
-  to: string;
+  to: string | null;
   /** Omitted entirely for viewers who may not see notes. */
   note?: string | null;
   changedBy: UserRef | null;

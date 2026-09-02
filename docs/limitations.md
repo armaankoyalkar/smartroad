@@ -40,5 +40,7 @@ SmartRoad is an academic prototype. The points below are stated plainly so that 
 - **Single-process assumptions:** the in-memory TTL cache and rate limiter do not scale across instances.
 - **Local disk uploads:** a hosting platform without a persistent disk needs the cloud storage adapter listed in future scope.
 - **Timeline buckets and derived temporal features use one configured timezone** (`ANALYTICS_TIMEZONE`, default Asia/Kolkata), not the reporter's timezone.
+- **Public map markers are not keyboard-reachable.** Markers are canvas-drawn circle markers, so a keyboard or screen-reader user cannot open a marker on `/map`; the admin pages offer tables as an alternative, the public map does not yet. Listed as the first accessibility improvement in `docs/future-scope.md`.
+- **Session restore during a network outage** sends the user to the sign-in page (the stored token is kept but not retried automatically).
 - **End-to-end coverage is a smoke test,** not a browser automation suite; UI behaviour is covered by component tests.
 - **Windows development inside OneDrive** slows `npm install` noticeably; the README recommends excluding `node_modules` from syncing.

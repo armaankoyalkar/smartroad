@@ -45,7 +45,7 @@ export function RiskContextForm({ value, onApply, specs, disabled = false }: Ris
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    const parsed = partialSchema.safeParse(draft);
+    const parsed = partialSchema.safeParse(Object.fromEntries(Object.entries(draft).filter(([, v]) => v !== "")));
     if (!parsed.success) {
       const next: typeof errors = {};
       for (const issue of parsed.error.issues) {

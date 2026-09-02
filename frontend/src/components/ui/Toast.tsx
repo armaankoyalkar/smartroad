@@ -70,23 +70,24 @@ export function ToastProvider({ children, max = 5, defaultDuration = 5000 }: Toa
         )}
       >
         {toasts.map((toast) => (
-          <ToastCard key={toast.id} toast={toast} onDismiss={() => api.dismiss(toast.id)} />
+          <ToastCard key={toast.id} toast={toast} dismiss={api.dismiss} />
         ))}
       </div>
     </ToastContext.Provider>
   );
 }
 
-function ToastCard({ toast, onDismiss }: { toast: ToastItem; onDismiss: () => void }) {
+function ToastCard({ toast, dismiss }: { toast: ToastItem; dismiss: (id: string) => void }) {
+  const onDismiss = () => dismiss(toast.id);
   const [paused, setPaused] = useState(false);
   const config = TONES[toast.tone];
   const Icon = config.icon;
 
   useEffect(() => {
     if (toast.duration <= 0 || paused) return;
-    const timer = window.setTimeout(onDismiss, toast.duration);
+    const timer = window.setTimeout(() => dismiss(toast.id), toast.duration);
     return () => window.clearTimeout(timer);
-  }, [toast.duration, paused, onDismiss]);
+  }, [toast.duration, toast.id, paused, dismiss]);
 
   return (
     <div
