@@ -1,0 +1,49 @@
+# Environment and secrets (every service). Only the *.example files are committed.
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+frontend/dist/
+backend/dist/
+backend/coverage/
+frontend/coverage/
+*.tsbuildinfo
+
+# Uploads and generated files
+backend/uploads/
+tests/e2e/output/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+ml/artifacts/*
+!ml/artifacts/README.md
+!ml/artifacts/.gitkeep
+
+# Datasets: raw data is never committed. The demo generator script is; its output is not.
+data/raw/
+data/processed/
+data/**/*.csv
+data/**/*.parquet
+data/**/*.zip
+ml/data/
+
+# Editors and OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
