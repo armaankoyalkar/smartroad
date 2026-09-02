@@ -1,96 +1,95 @@
 # SmartRoad backend
 
-Node.js + Express 5 REST API with MongoDB (Mongoose 9). Phase 2 delivers the foundation: configuration, database models, error handling, health and meta endpoints, seed scripts and the test setup. Authentication routes arrive in Phase 3 and incident routes in Phase 4.
-
-Design references: `docs/02-architecture.md` (section 2.1 for the layering), `docs/03-database-schema.md`, `docs/04-api-contract.md`.
+Express 5 + TypeScript REST API with MongoDB (Mongoose 9). The contract it implements is `docs/api.md`; the conventions are in `CLAUDE.md`.
 
 ## Requirements
 
-- Node.js 20.11 or newer (22 LTS recommended). Check with `node -v`.
-- A MongoDB server: either a local MongoDB Community Server or a free MongoDB Atlas cluster. Either works; only `MONGODB_URI` changes.
-- npm (comes with Node).
+- Node.js 20.11 or newer (24 recommended). Check with `node -v`.
+- A MongoDB server: a local MongoDB Community Server or a MongoDB Atlas cluster. Only `MONGODB_URI` changes.
 
 ## First run
 
 ```bash
 cd backend
 npm install
-copy .env.example .env        # Windows (use `cp .env.example .env` on Linux or macOS)
+cp .env.example .env          # Windows: copy .env.example .env
 ```
 
-Edit `.env`: set `MONGODB_URI`, replace `JWT_SECRET` with a long random string (the file shows a one-line command that generates one), and set `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD`.
+Edit `.env`: set `MONGODB_URI`, replace `JWT_SECRET` with a long random string (the file shows a one-line command that generates one) and set the `SEED_ADMIN_*` values.
 
 ```bash
-npm run seed      # creates the administrator and three demo citizen accounts
-npm run dev       # starts the API on http://localhost:5000 with auto-reload
+npm run seed      # creates the administrator and three demo citizen accounts (source: "seed")
+npm run dev       # starts the API on http://localhost:5000 with auto-reload (tsx watch)
 ```
 
-Check it is alive: open `http://localhost:5000/api/health` in a browser. `checks.database.status` should be `up`; `checks.mlService.status` stays `down` until Phase 8.
+Check it is alive: `http://localhost:5000/api/health`. `checks.database.status` should be `up`; `checks.mlService.status` is `down` until the ML service runs.
 
 ## Scripts
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Start with `node --watch` and the variables from `.env`. |
-| `npm start` | Start without watching (deployment). Variables come from the platform. |
-| `npm test` | Run the whole test suite once (see Testing). |
-| `npm run test:watch` | Re-run tests on change. |
-| `npm run lint` | ESLint over `src/` and `tests/`. |
-| `npm run format` | Prettier over `src/` and `tests/`. |
+| `npm run dev` | Start from the TypeScript sources with `tsx watch` and the variables from `.env`. |
+| `npm run build` | Compile `src/` to `dist/` (`tsconfig.build.json`). |
+| `npm start` | Run the compiled `dist/server.js` (deployment). |
+| `npm run typecheck` | `tsc --noEmit` over sources and tests. |
+| `npm test` / `npm run test:watch` | Vitest: unit tests (no database) and integration tests (see Testing). |
+| `npm run lint` / `npm run format` | ESLint (typescript-eslint) and Prettier. |
 | `npm run seed` | Upsert the admin from `.env`, the demo citizens, and replace seed incidents. |
 | `npm run seed:load` | Same, plus 1,000 generated Hyderabad incidents for performance checks (`source: "seed"`). |
 | `npm run seed:clear` | Remove every seed incident; accounts and user reports are untouched. |
-| `npm run create-admin -- --email x@y.z --password "..." --name "..."` | Add another administrator (decision D-03). |
+| `npm run create-admin -- --email x@y.z --password "..." --name "..."` | Add another administrator. |
 | `npm run deactivate-user -- --email x@y.z [--reactivate]` | Block or unblock an account without deleting it. |
 
 Demo citizen accounts created by the seed: `citizen1@smartroad.demo`, `citizen2@smartroad.demo`, `citizen3@smartroad.demo`, all with the password from `SEED_DEMO_PASSWORD`.
 
-## Endpoints available after Phase 2
+## Endpoints implemented in this foundation
 
 | Method | Path | Notes |
 |---|---|---|
 | GET | `/api/health` | 200 with database up, 503 otherwise; also reports the ML service. |
-| GET | `/api/meta/categories` | Category keys, labels, colours, descriptions. |
-| GET | `/api/meta/enums` | Severities, priorities, statuses, allowed transitions, labels, map defaults, upload limits. |
+| GET | `/api/meta/categories` | The ten category keys, labels, colours, descriptions. |
+| GET | `/api/meta/enums` | Roles, severities, priorities, statuses, verification states, risk levels, transitions, labels, map defaults, upload limits. |
+| GET | `/uploads/:filename` | Stored incident images only (JPEG, PNG, WebP by generated name). |
 
-Everything else returns the standard 404 envelope. Response and error shapes follow `docs/04-api-contract.md` section 1.
+`/api/auth`, `/api/users`, `/api/incidents`, `/api/analytics`, `/api/map` and `/api/ml` are mounted as empty routers in `src/routes/*.routes.ts`; every path under them returns the standard 404 envelope until the feature is implemented.
 
 ## Layout
 
 ```
 src/
-  server.js              start-up: connect, listen, graceful shutdown
-  app.js                 express app: helmet, cors, json, rate limit, routes, error handler
-  config/                env.js (validated environment), db.js, enums.js, categories.js
-  middleware/            auth.js, requireRole.js, validate.js, rateLimit.js, errorHandler.js
-  models/                User.js, Incident.js
+  server.ts              start-up: connect, create the upload directory, listen, graceful shutdown
+  app.ts                 express app: helmet, cors, json, /uploads static, rate limit, routes, error handler
+  config/                env.ts (validated environment), db.ts, enums.ts, categories.ts, mlFeatures.ts
+  middleware/            auth.ts, requireRole.ts, validate.ts, upload.ts, rateLimit.ts, errorHandler.ts
+  models/                User.ts, Incident.ts (typed schemas, documents and models)
   routes/ controllers/   one file per resource
   services/              business rules (incident lifecycle)
-  lib/                   errors.js, geo.js, cache.js, mlClient.js, serializers.js
-  scripts/               seed.js, createAdmin.js, deactivateUser.js (+ lib/)
+  lib/                   errors, geo, cache, mlClient, serializers, storage, pagination,
+                         incidentFilters, time, case, asyncHandler
+  validation/            common.schema.ts (shared zod building blocks)
+  scripts/               seed.ts, createAdmin.ts, deactivateUser.ts (+ lib/)
+  types/                 express.d.ts (req.user, req.validated)
 tests/
   unit/                  no database needed
   integration/           need MongoDB (see below)
-  setup/                 test environment, database helpers
+  setup/ helpers/        test environment, database helpers, image fixtures
 ```
 
-Request flow: middleware, then route, then controller, then service, then model. Controllers never query Mongoose directly; services never touch `req` or `res`.
+Request flow: middleware, then route, then controller, then service, then model. Controllers never query Mongoose directly; services never touch `req` or `res`. Validation happens in zod schemas passed to `validate()`; parsed values are on `req.validated` (typed through `ValidatedRequest<typeof schemas>`). Errors are thrown as `AppError` with a code from `src/lib/errors.ts`.
 
 ## Testing
 
-`npm test` runs unit tests (no database) and integration tests. For the integration tests the setup looks for a database in this order:
+`npm test` runs unit tests and integration tests. For the integration tests the setup looks for a database in this order:
 
-1. `MONGODB_TEST_URI` if set (for example `mongodb://127.0.0.1:27017`), or
-2. `mongodb-memory-server`, which downloads a MongoDB binary the first time (about 100 MB, cached in your user profile) and starts it in memory.
+1. `MONGODB_TEST_URI` if set (for example `mongodb://127.0.0.1:27017`);
+2. a MongoDB answering on `127.0.0.1:27017`;
+3. `mongodb-memory-server`, which downloads a MongoDB binary the first time (about 100 MB, cached in your user profile).
 
-If neither is available the integration tests are skipped with a warning. Set `SMARTROAD_REQUIRE_DB=1` to make that a failure instead (recommended in CI and before a phase is called done).
-
-Status at the end of Phase 2: the 72 unit tests pass in the environment where the code was written. The 12 integration tests are written but could not be executed there because MongoDB binaries were not downloadable from that network. Run `npm test` on your machine and record the result before starting Phase 3.
+If none is available the integration tests are skipped with a warning. Set `SMARTROAD_REQUIRE_DB=1` to make that a failure instead (use it in CI). Tests write uploads to a temporary directory, never to `uploads/`.
 
 ## Conventions worth knowing
 
-- Enum keys (`REPORTED`, `POTHOLE`, `HIGH`) live in `src/config/enums.js` and `src/config/categories.js` only.
-- Coordinates: the database stores GeoJSON `[longitude, latitude]`; the API always exposes `latitude` and `longitude`. Convert only through `src/lib/geo.js`.
-- Validation happens in zod schemas passed to `validate()`; parsed values are on `req.validated`.
-- Errors are thrown as `AppError` with a code from `src/lib/errors.js`; the error handler produces the envelope.
-- Passwords are hashed with bcryptjs (the same bcrypt algorithm, pure JavaScript, so nothing native has to compile on Windows).
+- Enum keys (`SUBMITTED`, `POTHOLE`, `HIGH`) live in `src/config/enums.ts` and `src/config/categories.ts` only, and match `docs/api.md` section 2.
+- Coordinates: the database stores GeoJSON `[longitude, latitude]`; the API exposes `latitude` and `longitude`. Convert only through `src/lib/geo.ts`.
+- Seed data is marked `source: "seed"`; nothing in this service invents statistics.
+- Passwords are hashed with bcryptjs (pure JavaScript, nothing native to compile on Windows).

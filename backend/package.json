@@ -1,25 +1,32 @@
 {
   "name": "smartroad-backend",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
-  "description": "SmartRoad REST API (Express 5 + MongoDB)",
+  "description": "SmartRoad REST API (Express 5 + TypeScript + MongoDB)",
   "type": "module",
-  "main": "src/server.js",
+  "main": "dist/server.js",
   "engines": {
     "node": ">=20.11"
   },
   "scripts": {
-    "dev": "node --watch --env-file=.env src/server.js",
-    "start": "node src/server.js",
+    "dev": "tsx watch --env-file=.env src/server.ts",
+    "start": "node --env-file=.env dist/server.js",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
-    "format": "prettier --write \"src/**/*.js\" \"tests/**/*.js\"",
-    "seed": "node --env-file=.env src/scripts/seed.js",
-    "seed:load": "node --env-file=.env src/scripts/seed.js --load 1000",
-    "seed:clear": "node --env-file=.env src/scripts/seed.js --clear",
-    "create-admin": "node --env-file=.env src/scripts/createAdmin.js",
-    "deactivate-user": "node --env-file=.env src/scripts/deactivateUser.js"
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{js,ts,json}\"",
+    "seed": "tsx --env-file=.env src/scripts/seed.ts",
+    "seed:load": "tsx --env-file=.env src/scripts/seed.ts --load 1000",
+    "seed:clear": "tsx --env-file=.env src/scripts/seed.ts --clear",
+    "create-admin": "tsx --env-file=.env src/scripts/createAdmin.ts",
+    "deactivate-user": "tsx --env-file=.env src/scripts/deactivateUser.ts"
+  },
+  "config": {
+    "mongodbMemoryServer": {
+      "disablePostinstall": true
+    }
   },
   "dependencies": {
     "axios": "^1.20.0",
@@ -27,20 +34,32 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.0",
+    "file-type": "^22.0.2",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.4",
     "morgan": "^1.12.0",
+    "multer": "^2.3.0",
     "zod": "^4.5.4"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^24.13.3",
+    "@types/supertest": "^7.2.1",
     "eslint": "^10.9.1",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.12.0",
     "mongodb-memory-server": "^11.2.0",
     "prettier": "^3.9.6",
     "supertest": "^7.2.2",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.69.0",
     "vitest": "^4.1.11"
   }
 }

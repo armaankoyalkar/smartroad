@@ -1,0 +1,22 @@
+# Optional: a local MongoDB for development when no MongoDB server is installed.
+#   docker compose up -d mongo      start
+#   docker compose down             stop (data persists in the named volume)
+#   docker compose down -v          stop and delete the data
+# Then set MONGODB_URI=mongodb://127.0.0.1:27017/smartroad in backend/.env.
+services:
+  mongo:
+    image: mongo:7
+    container_name: smartroad-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - smartroad-mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  smartroad-mongo-data:

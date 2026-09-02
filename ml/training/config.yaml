@@ -1,0 +1,55 @@
+# Training configuration for `python -m training.run_pipeline`. CLI flags override these values.
+
+# Path to a prepared CSV (schema in data/README.md). null = generate the DEMO (synthetic) dataset.
+dataset: null
+# null | stats19 : apply training/adapters/stats19.py to a raw UK STATS19 collisions CSV first.
+adapter: null
+demo_rows: 6000
+demo_seed: 42
+
+target: severity
+random_state: 42
+test_size: 0.2
+# {model} becomes lr, dt or rf for the selected candidate, so the label never misnames the model
+# (docs/api.md examples show demo-rf-1.0.0, the value produced when the RandomForest wins).
+model_version: demo-{model}-1.0.0
+
+# The shipped feature set is fixed by docs/api.md section 9 and must equal app.constants.FEATURE_NAMES.
+features:
+  - hour
+  - day_of_week
+  - month
+  - light_conditions
+  - weather
+  - road_surface
+  - road_type
+  - speed_limit
+  - area_type
+  - category
+# Extra features for the research variant (never served; see docs/design/02-architecture.md 6.3).
+research_extra_features: [latitude, longitude, nearby_density]
+nearby_density_radius_m: 500
+
+cv_folds: 5
+permutation_repeats: 5
+
+models:
+  logistic_regression: { C: 1.0, max_iter: 5000 }
+  decision_tree: { min_samples_leaf: 5 }
+  random_forest: { n_estimators: 300, min_samples_leaf: 2, max_features: sqrt }
+  quick_n_estimators: 100
+
+dbscan: { eps_m: 200, min_samples: 4 }
+
+# Dataset card used when `dataset` points at a real prepared CSV. Every field must be filled in
+# before training on real data (FR-ML1). The demo card lives in data/generate_demo_dataset.py.
+dataset_card:
+  name: null
+  source: null
+  url: null
+  access_date: null
+  licence: null
+  target_definition: null
+  geographic_coverage: null
+  temporal_coverage: null
+  limitations: []

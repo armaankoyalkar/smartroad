@@ -1,0 +1,6 @@
+# Development-only dependencies (tests and linting).
+pytest>=8
+# Starlette's TestClient uses httpx2 when present (httpx is kept for older Starlette releases).
+httpx>=0.27
+httpx2>=2.0
+ruff>=0.6
