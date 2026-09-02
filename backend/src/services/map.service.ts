@@ -114,11 +114,16 @@ export async function listMapIncidents(
   viewer: MapViewer | null | undefined,
 ): Promise<MapIncidentsResult> {
   const isAdmin = viewer?.role === ROLES.ADMIN;
-  const { limit, priority, ...filters } = query;
-  // `priority` is an admin-only filter (docs/api.md section 8): other callers
-  // never see priorities, so a priority filter from them is ignored.
+  const { limit, priority, riskLevel, ...filters } = query;
+  // `priority` and `riskLevel` are admin-only filters (docs/api.md section 8):
+  // other callers never see those values, so honouring the filter would leak
+  // them through the result set. Both are ignored for non-admins.
   const filter = buildIncidentFilter(
-    { ...filters, ...(isAdmin && priority ? { priority } : {}) },
+    {
+      ...filters,
+      ...(isAdmin && priority ? { priority } : {}),
+      ...(isAdmin && riskLevel ? { riskLevel } : {}),
+    },
     { isAdmin },
   );
 

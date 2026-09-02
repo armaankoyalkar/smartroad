@@ -87,6 +87,8 @@ frontend/src/
   components/layout/       PublicLayout, AppLayout (citizen), AdminLayout
   components/map/          MapCanvas, IncidentMarkers, Legend, MapFilters, LocationPicker, MiniMap, HotspotLayer, MapStatusBar
   components/charts/       ChartCard and Recharts wrappers plus domain charts
+  features/public|citizen|admin   page-specific helpers and sections (URL params, presets, landing content)
+  config.ts                VITE_* settings with defaults
   components/incidents/    IncidentForm, ImageDropzone, StatusTimeline, IncidentFacts, ...
   pages/public|citizen|admin
   hooks/, utils/, types/
@@ -204,7 +206,7 @@ sequenceDiagram
 - Timestamps are stored and transmitted in UTC ISO 8601; the UI formats them in the browser locale; temporal ML features and timeline buckets use `ANALYTICS_TIMEZONE`.
 - Coordinates: API fields `latitude` and `longitude`; storage as GeoJSON; only the map endpoint returns GeoJSON.
 - Ids are ObjectId strings.
-- Logging: morgan in development, `combined` in production, no request bodies logged.
+- Logging: morgan with the format from `LOG_FORMAT` (default `dev`; set `combined` in production), no request bodies logged.
 
 ## 8. Deployment sketch
 

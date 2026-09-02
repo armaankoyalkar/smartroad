@@ -66,11 +66,11 @@ The complete reference copy is the root `.env.example`; each service reads only 
 | `JWT_EXPIRES_IN` | token lifetime | 24h |
 | `BCRYPT_ROUNDS` | bcrypt cost | 10 |
 | `CORS_ORIGIN` | comma-separated allowed origins | http://localhost:5173 |
-| `FRONTEND_URL` | public address of the SPA | http://localhost:5173 |
-| `UPLOAD_DIR`, `MAX_UPLOAD_MB` | image storage directory and size limit | uploads, 5 |
+| `FRONTEND_URL` | public address of the SPA (optional) | none |
+| `UPLOAD_DIR`, `MAX_UPLOAD_MB` | image storage directory and size limit (at most 25 MB) | uploads, 5 |
 | `ML_SERVICE_URL`, `ML_SERVICE_API_KEY`, `ML_TIMEOUT_MS` | ML service address, shared key, timeout | http://127.0.0.1:8000, empty, 8000 |
 | `ANALYTICS_TIMEZONE` | timezone for timeline buckets and derived temporal features | Asia/Kolkata |
-| `SEED_ADMIN_NAME`, `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`, `SEED_DEMO_PASSWORD` | demo accounts created by `npm run seed` | see example |
+| `SEED_ADMIN_NAME`, `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`, `SEED_DEMO_PASSWORD` | demo accounts created by `npm run seed`; the email and both passwords are required by the seed script (at least 8 characters); the seed refuses to run with `NODE_ENV=production` unless `--force` is passed | see example |
 | `MAP_CENTER_LAT`, `MAP_CENTER_LNG`, `MAP_ZOOM` | default map view | Hyderabad, 12 |
 | `TRUST_PROXY` | 1 behind a reverse proxy | 0 |
 | `RATE_LIMIT_*` | rate limits | see example |
@@ -124,7 +124,7 @@ Checklist for a deployment:
 4. Uploads need a persistent disk at `UPLOAD_DIR`; platforms without one need the object-storage adapter listed in `docs/future-scope.md`.
 5. Build the SPA with `VITE_API_URL` pointing at the public API origin.
 6. Run the seed script once (`npm run seed`) with strong demo passwords, or create the administrator with `npm run create-admin -- --email ... --password ...` and skip the demo incidents.
-7. Smoke-test with `API_URL=https://<api-host> ADMIN_EMAIL=... ADMIN_PASSWORD=... node tests/e2e/run.mjs`.
+7. Smoke-test with `API_URL=https://<api-host> ADMIN_EMAIL=... ADMIN_PASSWORD=... node tests/e2e/run.mjs` (add `E2E_REQUIRE_ML=1` to fail when the ML service is down instead of skipping its checks).
 
 ## 6. Operations
 

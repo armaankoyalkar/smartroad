@@ -63,7 +63,7 @@ DBSCAN (Ester, Kriegel, Sander and Xu, 1996) was chosen because it does not need
 - Small data: with fewer than `min_samples` points the response has no clusters and the UI says "not enough data for hotspots".
 - Wording: the UI and documentation call these "clusters of reported incidents". They describe where reports are dense; they are not an output of the risk classifier and are not weighted by severity in this version.
 
-The demo seed set includes several deliberate clusters (5 to 9 incidents within about 150 m) and isolated points, so the default parameters find clusters and label noise during a demonstration.
+The demo seed set includes five deliberate clusters (5 to 7 incidents within about 100 m of a centre) and 50 isolated points at least 300 m apart, so the default parameters find clusters and label noise during a demonstration.
 
 ## 6. Usage terms
 

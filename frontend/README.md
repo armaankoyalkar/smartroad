@@ -33,10 +33,11 @@ src/
   components/ui/         design-system primitives (import from "@/components/ui")
   components/layout/     PublicLayout, AppLayout (citizen), AdminLayout, Logo, Footer, UserMenu
   components/map/        MapCanvas, IncidentMarkers, Legend, MapFilters, LocationPicker, MiniMap, HotspotLayer, MapStatusBar
-  components/charts/     ChartCard, BarChartBasic, DonutChart, LineChartBasic, chartTheme
+  components/charts/     ChartCard, Recharts wrappers and the domain charts (breakdown, timeline, confusion matrix, importance, probabilities)
+  features/public|citizen|admin   page-specific helpers and sections
   hooks/                 useQueryParams, useGeolocation, useReverseGeocode, useDebounce, useDocumentTitle, useFocusTrap
   utils/                 format.ts, validation.ts (zod), files.ts, formErrors.ts, cn.ts
-  pages/public|citizen|admin   one file per route (placeholders until each page is built)
+  pages/public|citizen|admin   one file per route (all 18 pages implemented)
   test/                  setup.ts (jest-dom, browser API stubs) and utils.tsx (renderWithProviders, fixtures)
 ```
 

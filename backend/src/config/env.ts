@@ -58,7 +58,7 @@ const envSchema = z.object({
   SEED_ADMIN_NAME: z.string().default("SmartRoad Admin"),
   SEED_ADMIN_EMAIL: z.string().optional(),
   SEED_ADMIN_PASSWORD: z.string().optional(),
-  SEED_DEMO_PASSWORD: z.string().default("demo-citizen-password"),
+  SEED_DEMO_PASSWORD: z.string().min(8, "SEED_DEMO_PASSWORD must be at least 8 characters").optional(),
   MAP_CENTER_LAT: z.coerce.number().min(-90).max(90).default(17.385),
   MAP_CENTER_LNG: z.coerce.number().min(-180).max(180).default(78.4867),
   MAP_ZOOM: z.coerce.number().int().min(1).max(19).default(12),

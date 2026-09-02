@@ -18,7 +18,7 @@ cp .env.example .env          # Windows: copy .env.example .env
 Edit `.env`: set `MONGODB_URI`, replace `JWT_SECRET` with a long random string (the file shows a one-line command that generates one) and set the `SEED_ADMIN_*` values.
 
 ```bash
-npm run seed      # creates the administrator and three demo citizen accounts (source: "seed")
+npm run seed      # creates the administrator, three demo citizen accounts and the 80 curated demo incidents (incidents carry `source: "seed"`)
 npm run dev       # starts the API on http://localhost:5000 with auto-reload (tsx watch)
 ```
 
@@ -42,16 +42,9 @@ Check it is alive: `http://localhost:5000/api/health`. `checks.database.status` 
 
 Demo citizen accounts created by the seed: `citizen1@smartroad.demo`, `citizen2@smartroad.demo`, `citizen3@smartroad.demo`, all with the password from `SEED_DEMO_PASSWORD`.
 
-## Endpoints implemented in this foundation
+## Endpoints
 
-| Method | Path | Notes |
-|---|---|---|
-| GET | `/api/health` | 200 with database up, 503 otherwise; also reports the ML service. |
-| GET | `/api/meta/categories` | The ten category keys, labels, colours, descriptions. |
-| GET | `/api/meta/enums` | Roles, severities, priorities, statuses, verification states, risk levels, transitions, labels, map defaults, upload limits. |
-| GET | `/uploads/:filename` | Stored incident images only (JPEG, PNG, WebP by generated name). |
-
-`/api/auth`, `/api/users`, `/api/incidents`, `/api/analytics`, `/api/map` and `/api/ml` are mounted as empty routers in `src/routes/*.routes.ts`; every path under them returns the standard 404 envelope until the feature is implemented.
+All 32 routes (health, meta, auth, users, incidents, analytics, map, ML proxy and `/uploads/:filename`) are implemented; the contract with every request and response shape is `docs/api.md` section 3 onwards.
 
 ## Layout
 
@@ -63,10 +56,10 @@ src/
   middleware/            auth.ts, requireRole.ts, validate.ts, upload.ts, rateLimit.ts, errorHandler.ts
   models/                User.ts, Incident.ts (typed schemas, documents and models)
   routes/ controllers/   one file per resource
-  services/              business rules (incident lifecycle)
+  services/              auth, user, incident, incidentStatus, analytics, analyticsCharts, map, hotspot, ml, riskFeatures
   lib/                   errors, geo, cache, mlClient, serializers, storage, pagination,
                          incidentFilters, time, case, asyncHandler
-  validation/            common.schema.ts (shared zod building blocks)
+  validation/            common.schema.ts plus auth, user, incident, analytics, map and ml schemas
   scripts/               seed.ts, createAdmin.ts, deactivateUser.ts (+ lib/)
   types/                 express.d.ts (req.user, req.validated)
 tests/

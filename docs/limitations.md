@@ -1,6 +1,6 @@
 # SmartRoad known limitations
 
-SmartRoad is an academic prototype. The points below are stated plainly so that the project review and the report do not claim more than the system does. Items marked "verified" were confirmed during the final verification run; see `docs/testing.md` for the test results.
+SmartRoad is an academic prototype. The points below are stated plainly so that the project review and the report do not claim more than the system does. The executed test results are in `docs/testing.md`.
 
 ## 1. Machine learning
 
@@ -23,6 +23,7 @@ SmartRoad is an academic prototype. The points below are stated plainly so that 
 - **Uploaded images are validated by magic bytes and size but not re-encoded,** so EXIF metadata (which may include GPS tags) is kept as uploaded. The form warns users not to photograph people or number plates.
 - **Rate limiting is in-memory per API process.** Several API instances would need a shared store.
 - **No CAPTCHA** on registration; spam is limited by rate limits and by administrators rejecting or deleting reports.
+- **Known low-severity gaps from the security review:** on `PATCH /api/incidents/:id` the multipart body (up to the upload limit) is buffered before the ownership check runs, bounded only by the global per-IP limit; the hotspot cache is keyed by free-form admin parameters and has no size cap. Both are recorded rather than fixed in this version.
 
 ## 4. Product scope
 

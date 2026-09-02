@@ -22,6 +22,7 @@ process.env.RATE_LIMIT_AUTH_MAX = "100000";
 process.env.RATE_LIMIT_REPORTS_PER_HOUR = "100000";
 process.env.SEED_ADMIN_EMAIL = "admin@test.local";
 process.env.SEED_ADMIN_PASSWORD = "admin-test-password";
+process.env.SEED_DEMO_PASSWORD = "demo-citizen-password";
 // Uploads written by tests go to a temporary directory (removed by globalSetup's teardown).
 process.env.UPLOAD_DIR = TEST_UPLOAD_DIR();
 

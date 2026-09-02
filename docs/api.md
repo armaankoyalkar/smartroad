@@ -275,7 +275,7 @@ Admin analytics accept optional `from`, `to` and `includeSeed` (default `true`).
 
 ### GET `/api/analytics/public` (none)
 
-`data`: `{ reportsFiled, reportsResolved, reportsLast30Days, resolvedLast30Days, generatedAt }`. Excludes REJECTED incidents and seed records. Cached for 5 minutes.
+`data`: `{ reportsFiled, reportsResolved, reportsLast30Days, resolvedLast30Days, generatedAt }`. Excludes REJECTED incidents and seed records. Cached for 5 minutes; `meta.cached` says whether the response came from the cache.
 
 ### GET `/api/analytics/mine` (signed-in)
 
@@ -307,7 +307,7 @@ Admin analytics accept optional `from`, `to` and `includeSeed` (default `true`).
 
 ### GET `/api/map/incidents` (none)
 
-Query: `status`, `category`, `severity`, `priority` (admin only), `riskLevel`, `source`, `from`, `to`, `bbox=minLng,minLat,maxLng,maxLat`, `limit` (1 to 5000, default 5000). Callers without an admin token never receive REJECTED incidents (a `status` filter containing REJECTED is silently reduced). When more incidents match than `limit`, the newest `limit` are returned and `meta.truncated` is `true`. GeoJSON FeatureCollection:
+Query: `status`, `category`, `severity`, `priority` (admin only), `riskLevel` (admin only), `source`, `from`, `to`, `bbox=minLng,minLat,maxLng,maxLat`, `limit` (1 to 5000, default 5000). Callers without an admin token never receive REJECTED incidents (a `status` filter containing REJECTED is silently reduced). When more incidents match than `limit`, the newest `limit` are returned and `meta.truncated` is `true`. GeoJSON FeatureCollection:
 
 ```json
 {
@@ -354,7 +354,7 @@ The browser never calls the ML service; everything goes through these routes. Ev
 
 ### GET `/api/ml/model-info`
 
-Cached for 10 minutes. `data` is the ML service's `/model/info` converted to camelCase:
+Cached for 10 minutes (`meta.cached`). `data` is the ML service's `/model/info` converted to camelCase. The service may add keys beyond the example (`selectionRule`, `selectedCandidate`, `validation`, `sklearnVersion`, `pythonVersion`, `dataset.recordsBeforeCleaning`, `comparison[].weightedF1/cvMacroF1/cvMacroF1Std/fitSeconds`, `featureImportance[].importanceStd`, `researchModel.featureImportance`); `featureImportance` carries both `impurity` and `permutation` entries when the shipped model is a tree model:
 
 ```json
 {

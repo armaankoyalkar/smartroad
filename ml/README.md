@@ -60,6 +60,7 @@ python -m training.run_pipeline --quick         # 100 trees (used by the tests o
 python -m training.run_pipeline --rows 2000     # smaller demo sample
 python -m training.run_pipeline --out /some/dir
 python -m training.run_pipeline --dataset path/prepared.csv                    # real prepared CSV
+python -m training.run_pipeline --log-level debug                              # verbose logging
 python -m training.run_pipeline --dataset path/stats19.csv --adapter stats19   # raw STATS19 export
 ```
 
@@ -144,7 +145,7 @@ or `node scripts/ml.js serve` from the repository root (reads `ml/.env`, used by
 ## Test and lint
 
 ```
-python -m pytest -q          # trains a quick model on 800 demo rows once per session (about 10 s)
+python -m pytest -q          # trains a quick model on 800 demo rows once per session (about 20 s)
 python -m ruff check .
 python -m ruff format --check .
 ```

@@ -48,7 +48,7 @@ Held-out test set: 1200 records (LOW 652, MEDIUM 369, HIGH 179). Training set: 4
 | Decision Tree | 0.6367 | 0.6133 | 0.6459 | 0.6016 ± 0.0085 |
 | **Random Forest (shipped, `demo-rf-1.0.0`)** | **0.7092** | **0.6875** | **0.7140** | 0.6793 ± 0.0062 |
 
-The Random Forest wins on the selection metric. The Logistic Regression has a slightly higher cross-validated score on the training fold (0.6944 vs 0.6793); the margin is small and the pipeline reports both rather than claiming that one model is generally better. Before interaction terms were added to the synthetic rule, the Logistic Regression won (macro F1 0.6509 vs 0.6172); that history is recorded here because it shows how strongly the outcome depends on the shape of the synthetic rule.
+The Random Forest wins on the selection metric. The Logistic Regression has a slightly higher cross-validated score on the training fold (0.6944 vs 0.6793); the margin is small and the pipeline reports both rather than claiming that one model is generally better. Before interaction terms were added to the synthetic rule (an earlier run whose artifacts were replaced), the Logistic Regression won; that history is mentioned because it shows how strongly the outcome depends on the shape of the synthetic rule.
 
 Per-class results of the shipped model:
 
@@ -85,7 +85,7 @@ Feature importance of the shipped model (permutation importance on the test set,
 
 Permutation importance is the more trustworthy of the two (impurity importance favours high-cardinality features such as hour and day of week). The ranking mirrors the generator's rule, which is the expected outcome on synthetic data.
 
-Research model (Random Forest with latitude, longitude and nearby_density added; reported for the feature-importance discussion, never served): accuracy 0.7108, macro F1 0.6892. Its top impurity importances are road_type, category, speed_limit, latitude and longitude. The shipped model excludes coordinates because a model trained on one geography does not transfer to another.
+Research model (Random Forest with latitude, longitude and nearby_density added; reported for the feature-importance discussion, never served): accuracy 0.7108, macro F1 0.6892. Its impurity importances rank road_type (0.149), category (0.127), speed_limit (0.115), light_conditions (0.108) and hour (0.078) first, followed by latitude (0.073), longitude (0.072) and nearby_density (0.068). The shipped model excludes coordinates because a model trained on one geography does not transfer to another.
 
 ## 5. Serving
 

@@ -23,7 +23,12 @@ const initValidated: RequestHandler = (req, _res, next) => {
  * path only.
  */
 const uploadsGuard: RequestHandler = (req, res, next) => {
-  const name = decodeURIComponent(req.path.replace(/^\/+/, ""));
+  let name: string;
+  try {
+    name = decodeURIComponent(req.path.replace(/^\/+/, ""));
+  } catch {
+    return next(AppError.notFound("Image"));
+  }
   if (!isSafeFilename(name)) return next(AppError.notFound("Image"));
   res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
   return next();
@@ -72,7 +77,7 @@ export function createApp(): Express {
     app.use(morgan(env.LOG_FORMAT));
   }
 
-  app.use("/uploads", uploadsGuard, uploadsStatic);
+  app.use("/uploads", globalLimiter, uploadsGuard, uploadsStatic);
   app.use("/api", globalLimiter, apiRouter);
 
   app.use(notFoundHandler);

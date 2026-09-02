@@ -26,7 +26,7 @@ SmartRoad is a final-year engineering project: an intelligent web-based road saf
 - Layering: middleware -> route -> controller -> service -> model. Controllers never query Mongoose directly; services never read `req` or write `res`.
 - Validation: zod schemas in `src/validation/*.schema.ts` passed to the `validate()` middleware; parsed values are on `req.validated`.
 - Errors: throw `AppError` with a code from `src/lib/errors.ts`; the error handler produces the envelope.
-- Tests: `npm test` runs unit tests (no database) and integration tests. Integration tests use `MONGODB_TEST_URI` when set (a local MongoDB), otherwise `mongodb-memory-server`. Set `SMARTROAD_REQUIRE_DB=1` to fail instead of skipping.
+- Tests: `npm test` runs unit tests (no database) and integration tests. Integration tests use `MONGODB_TEST_URI` when set, otherwise a MongoDB answering on 127.0.0.1:27017, otherwise `mongodb-memory-server`. Set `SMARTROAD_REQUIRE_DB=1` to fail instead of skipping.
 
 ## Frontend conventions
 

@@ -27,7 +27,7 @@ export interface VerifiedFile extends Express.Multer.File {
 
 const parser = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: env.maxUploadBytes, files: 1, fields: 50, fieldSize: 64 * 1024 },
+  limits: { fileSize: env.maxUploadBytes, files: 1, fields: 12, fieldSize: 4 * 1024 },
 }).single(UPLOAD_FIELD);
 
 function translate(err: unknown): AppError {

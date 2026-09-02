@@ -18,6 +18,9 @@ import { parseArgs, stringArg, withDb } from "./lib/withDb.js";
 const args = parseArgs(process.argv.slice(2));
 
 await withDb(async () => {
+  if (env.isProduction && !args.force) {
+    throw new Error("Refusing to seed demo data with NODE_ENV=production. Pass --force if you really mean it.");
+  }
   if (args.clear) {
     const removed = await clearSeedIncidents();
     console.log(`Removed ${removed} seed incidents.`);
@@ -31,6 +34,9 @@ await withDb(async () => {
   });
   console.log(`Admin ready: ${admin.email}`);
 
+  if (!env.SEED_DEMO_PASSWORD) {
+    throw new Error("SEED_DEMO_PASSWORD must be set in .env (at least 8 characters) to create the demo citizens.");
+  }
   const citizens = await seedDemoCitizens(env.SEED_DEMO_PASSWORD);
   console.log(`Demo citizens ready: ${citizens.map((c) => c.email).join(", ")}`);
 

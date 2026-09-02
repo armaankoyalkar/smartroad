@@ -166,8 +166,11 @@ describe.skipIf(!mongoUri())("GET /api/map/incidents", () => {
     const from = new Date(now.getTime() - 6 * 86_400_000).toISOString();
     const recent = await request(app).get("/api/map/incidents").query({ from });
     expect(ids(recent.body)).toEqual(keys(recent.body, ["A", "B", "C"]));
-    const risky = await request(app).get("/api/map/incidents?riskLevel=HIGH,MEDIUM");
+    // riskLevel is admin-only: honouring it anonymously would disclose stored estimates.
+    const risky = await request(app).get("/api/map/incidents?riskLevel=HIGH,MEDIUM").set(admin());
     expect(ids(risky.body)).toEqual(keys(risky.body, ["C", "D"]));
+    const riskyAnon = await request(app).get("/api/map/incidents?riskLevel=HIGH,MEDIUM");
+    expect(riskyAnon.body.meta.count).toBe(11);
 
     const unassigned = await request(app).get("/api/map/incidents?priority=UNASSIGNED").set(admin());
     expect(ids(unassigned.body)).toEqual(keys(unassigned.body, ["A", "F", "H", "K", "M"]));

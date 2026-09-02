@@ -79,12 +79,13 @@ Open http://localhost:5173. The API runs on http://localhost:5000/api and the ML
 | `npm run seed:clear` | Remove every seed incident (user reports are never touched) |
 | `npm run test:all` | Backend, frontend and ML test suites |
 | `npm run test:backend`, `npm run test:frontend`, `npm run ml:test` | One suite |
-| `npm run test:e2e` | End-to-end smoke test against the running services |
+| `npm run test:e2e` | End-to-end smoke test against the running services (`E2E_REQUIRE_ML=1` to require the ML service) |
+| `npm run install:ml` | Create `ml/.venv` and install the Python requirements only |
 | `npm run build:all` | Production builds (`backend/dist`, `frontend/dist`) |
 | `npm run lint:all` | ESLint for backend and frontend |
 | `npm run check:phrases` | Fails if the product or docs claim something the system does not do |
 
-Backend-only commands (from `backend/`): `npm run create-admin -- --email x@y.z --password "..."`, `npm run deactivate-user -- --email x@y.z [--reactivate]`, `npm run typecheck`.
+Backend-only commands (from `backend/`): `npm run create-admin -- --email x@y.z --password "..." [--name "Name"]`, `npm run deactivate-user -- --email x@y.z [--reactivate]`, `npm run typecheck`.
 
 ## Demo accounts
 
