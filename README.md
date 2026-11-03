@@ -4,13 +4,6 @@
 
 Final-year engineering project (academic prototype).
 
-| Role | Name |
-|---|---|
-| Project lead | Balaji Lakshmipathi |
-| Team members | Vivek Reddy, Arman Koyalkar |
-| Project guide | Rajesh Adluri |
-| Project acceptance | Aruja Jyothi Ma'am |
-
 SmartRoad is a web platform where citizens report road incidents (potholes, road damage, accidents, congestion, broken signals, street-light issues, unsafe conditions, obstructions, waterlogging) with a map location and a photo, and administrators verify, prioritise and track them to resolution. Administrators also get a GIS map, analytics, DBSCAN hotspot analysis of reported incidents and a Random Forest risk estimator trained by a documented scikit-learn pipeline.
 
 ## Stack
